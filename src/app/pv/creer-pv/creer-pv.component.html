@@ -1,0 +1,30 @@
+<form [formGroup]="pvForm" (ngSubmit)="createPV()" class="p-4 border rounded shadow-sm bg-white">
+
+    <div class="mb-4">
+        <label for="reunionId" class="form-label fw-semibold">Réunion</label>
+        <select id="reunionId" class="form-select" formControlName="reunionId">
+            <option *ngFor="let r of reunions" [value]="r.id">{{ r.sujet }}</option>
+        </select>
+    </div>
+
+    <div class="mb-4">
+        <label for="titre" class="form-label fw-semibold">Titre</label>
+        <input id="titre" type="text" class="form-control" formControlName="titre"
+            placeholder="Entrez le titre du PV" />
+    </div>
+
+    <div class="mb-4">
+        <label for="contenu" class="form-label fw-semibold">Contenu</label>
+        <textarea id="contenu" class="form-control" rows="4" formControlName="contenu"
+            placeholder="Contenu du PV"></textarea>
+    </div>
+
+    <div class="mb-4">
+        <label for="file" class="form-label fw-semibold">Fichier PDF</label>
+        <input id="file" type="file" class="form-control" (change)="onFileSelected($event)" accept=".pdf" />
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100 fw-semibold py-2">
+        Créer le PV
+    </button>
+</form>

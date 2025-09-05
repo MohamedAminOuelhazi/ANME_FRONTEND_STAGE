@@ -1,0 +1,10 @@
+<mat-list>
+    <mat-list-item *ngFor="let reunion of reunions">
+        <h3 matLine>{{ reunion.sujet }}</h3>
+        <p matLine>
+            Date proposée : {{ reunion.dateProposee | date:'medium' }} - Statut : {{ reunion.status }}
+        </p>
+        <button mat-button color="primary" [routerLink]="['/reunion', reunion.id, 'validation']">Valider</button>
+        <button mat-button color="accent" [routerLink]="['/reunion', reunion.id, 'confirmation']">Confirmer</button>
+    </mat-list-item>
+</mat-list>

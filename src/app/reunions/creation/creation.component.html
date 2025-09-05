@@ -1,0 +1,54 @@
+<form [formGroup]="forminput" (ngSubmit)="createReunion()" class="p-4 border rounded shadow-sm bg-white">
+
+    <div class="mb-4">
+        <label for="sujet" class="form-label fw-semibold">Sujet</label>
+        <input id="sujet" type="text" class="form-control" formControlName="sujet"
+            placeholder="Entrez le sujet de la réunion" />
+    </div>
+
+    <div class="mb-4">
+        <label for="description" class="form-label fw-semibold">Description</label>
+        <textarea id="description" class="form-control" rows="4" formControlName="description"
+            placeholder="Décrivez la réunion"></textarea>
+    </div>
+
+    <!-- Validateurs checklist -->
+    <div class="mb-4">
+        <label class="form-label fw-semibold">Validateurs</label>
+        <div formArrayName="validateurIds" class="row row-cols-1 row-cols-md-2 g-2">
+            <div *ngFor="let v of validateurs; let i = index" class="col">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" [formControlName]="i" [id]="'validateur-' + v.id" />
+                    <label class="form-check-label" [for]="'validateur-' + v.id">
+                        {{ v.firstname }} {{ v.lastname }}
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Participants checklist -->
+    <div class="mb-4">
+        <label class="form-label fw-semibold">Participants</label>
+        <div formArrayName="participantIds" class="row row-cols-1 row-cols-md-2 g-2">
+            <div *ngFor="let p of participants; let i = index" class="col">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" [formControlName]="i"
+                        [id]="'participant-' + p.id" />
+                    <label class="form-check-label" [for]="'participant-' + p.id">
+                        {{ p.firstname }} {{ p.lastname }}
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Champ dateProposee -->
+    <div class="mb-4">
+        <label for="dateProposee" class="form-label fw-semibold">Date proposée</label>
+        <input id="dateProposee" type="datetime-local" class="form-control" formControlName="dateProposee" />
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100 fw-semibold py-2">
+        Créer la réunion
+    </button>
+</form>

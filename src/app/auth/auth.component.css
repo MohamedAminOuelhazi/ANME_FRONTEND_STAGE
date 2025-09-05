@@ -1,0 +1,75 @@
+.divider:after,
+.divider:before {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #eee;
+}
+
+.h-custom {
+    height: calc(100% - 73px);
+}
+
+
+.login-section {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    max-width: 900px;
+    width: 100%;
+    gap: 2rem;
+}
+
+.login-image {
+    flex: 1;
+    text-align: center;
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+.login-form {
+    flex: 1;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.forgot-password {
+    margin-bottom: 1rem;
+}
+
+.login-button {
+    margin-top: 1rem;
+}
+
+.logo-slogan {
+    width: 20%;
+    /* Adjust size as needed */
+    display: block;
+    margin: 0 auto;
+    /* Fallback centering if flex fails */
+    margin-bottom: 80px;
+    /* Ajuste à 80px ou plus */
+
+}
+
+.custom-space {
+    margin-left: 50px;
+    /* espace entre logo et formulaire */
+}
+
+.logo-top {
+    margin-top: -120px;
+    /* remonte de 40px */
+}

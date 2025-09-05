@@ -1,0 +1,60 @@
+mat-card {
+    transition: box-shadow 0.3s ease-in-out;
+    border-radius: 0.8rem;
+}
+
+mat-card:hover {
+    box-shadow: 0 8px 16px rgba(22, 51, 98, 0.25);
+}
+
+mat-card-header {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+mat-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+mat-card-actions {
+    padding: 0.75rem 1rem;
+    justify-content: flex-start;
+}
+
+mat-chip {
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 0 8px;
+    border-radius: 16px;
+}
+
+mat-chip[color="primary"] {
+    background-color: #0d6efd;
+}
+
+mat-chip[color="warn"] {
+    background-color: #dc3545;
+}
+
+mat-chip[color="accent"] {
+    background-color: #6610f2;
+}
+
+/* consulter.component.css */
+.signature-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+#signatureCanvas {
+    max-width: 100%;
+    height: auto;
+    touch-action: none;
+    /* Important pour les appareils tactiles */
+}

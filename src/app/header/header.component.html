@@ -1,0 +1,85 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-indigo shadow px-4">
+    <div class="container-fluid">
+        <a class="navbar-brand mx-auto" href="#">
+            <img src="assets/logoslogan.png" alt="Sample image" style="width: 100px; height: auto;" />
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- Menu des routes -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li *ngIf="role === 'Fte'" class="nav-item">
+                    <a class="nav-link" routerLink="/Dashboard_fte/créerReunion" routerLinkActive="active">Créer
+                        Réunion</a>
+                </li>
+                <li *ngIf="role === 'Fte'" class="nav-item">
+                    <a class="nav-link" routerLink="/Dashboard_fte/consulterReunion" routerLinkActive="active">Consulter
+                        Réunion</a>
+                </li>
+                <li *ngIf="role === 'Fte'" class="nav-item">
+                    <a class="nav-link" routerLink="/Dashboard_fte/créerpv" routerLinkActive="active">Créer
+                        Pv</a>
+                </li>
+                <li *ngIf="role === 'Direction_technique'" class="nav-item">
+                    <a class="nav-link" routerLink="/Dashboard_directionTechnique/consulterReunion"
+                        routerLinkActive="active">Consulter Réunion</a>
+                </li>
+                <li *ngIf="role === 'Commission_techniques'" class="nav-item">
+                    <a class="nav-link" routerLink="/Dashboard_commissionTechniques/consulterReunion"
+                        routerLinkActive="active">Consulter Réunion</a>
+                </li>
+            </ul>
+
+            <div class="d-flex align-items-center gap-3">
+                <!-- Notifications -->
+                <div class="dropdown position-relative">
+                    <button class="btn btn-link p-0 position-relative text-white" id="notifDropdown"
+                        data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-controls="notifMenu"
+                        title="Notifications">
+                        <lucide-icon name="bell"></lucide-icon>
+                        <span *ngIf="unreadCount > 0"
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notif-badge">
+                            {{ unreadCount }}
+                            <span class="visually-hidden">notifications non lues</span>
+                        </span>
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg p-3 rounded-3" aria-labelledby="notifDropdown"
+                        id="notifMenu" style="width: 350px; max-height: 420px; overflow-y: auto;">
+                        <li *ngIf="filteredNotifications.length === 0"
+                            class="text-center text-muted py-4 fw-light fst-italic">
+                            Aucune notification non lue
+                        </li>
+
+                        <li *ngFor="let notif of filteredNotifications" class="mb-3">
+                            <button type="button"
+                                class="dropdown-item p-3 rounded border border-1 border-secondary-subtle text-start notif-item"
+                                (click)="onNotificationClick(notif)">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <small class="fw-semibold text-dark">{{ notif.title }}</small>
+                                    <small class="text-muted fst-italic" style="font-size: 0.75rem;">
+                                        {{ notif.createdAt | date:'short' }}
+                                    </small>
+                                </div>
+                                <div>
+                                    <small class="text-secondary notif-message">{{ notif.message }}</small>
+                                </div>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Logout -->
+                <button class="btn btn-outline-light d-flex align-items-center gap-2" (click)="logout()"
+                    title="Déconnexion">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="d-none d-lg-inline">Déconnexion</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</nav>

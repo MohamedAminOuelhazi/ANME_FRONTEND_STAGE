@@ -1,0 +1,567 @@
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary fw-bold">Gestion des Réunions</h2>
+
+    <div *ngIf="reunions.length === 0" class="text-center mt-5">
+        <i class="fas fa-calendar-times" style="font-size: 72px; color: #ccc;"></i>
+        <p class="text-muted fs-5 mt-3">Aucune réunion à afficher.</p>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Sujet</th>
+                    <th>Date proposée</th>
+                    <th>Statut</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let reunion of reunions">
+                    <td title="{{ reunion.sujet }}">{{ reunion.sujet }}</td>
+                    <td>{{ reunion.dateProposee | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>
+                        <span class="badge text-uppercase fw-semibold" [ngClass]="{
+                            'bg-success': reunion.status === 'CONFIRMED' || reunion.status === 'VALIDATED',
+                            'bg-primary': reunion.status === 'SCHEDULED',
+                            'bg-warning text-dark': reunion.status === 'PENDING',
+                            'bg-danger': reunion.status === 'CANCELLED',
+                            'bg-dark': reunion.status === 'REJECTED'
+                        }">
+                            {{ reunion.status }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <!-- Actions selon rôle -->
+                        <ng-container *ngIf="role === 'Fte'">
+                            <button *ngIf="reunion.status === 'SCHEDULED'" class="btn btn-sm btn-outline-primary me-1"
+                                (click)="confirmerReunion(reunion.id)" title="Confirmer la réunion">
+                                Confirmer
+                            </button>
+                            <button *ngIf="reunion.status === 'SCHEDULED'" class="btn btn-sm btn-outline-danger"
+                                (click)="openCancellationModal(reunion)" title="Annuler la réunion"
+                                data-bs-toggle="modal" data-bs-target="#cancellationModal">
+                                <i class="fas fa-ban"></i>
+                                Annuler
+                            </button>
+                            <span *ngIf="reunion.status === 'PENDING'"
+                                class="text-muted fst-italic badge text-uppercase fw-semibold bg-warning">En
+                                attente de
+                                validation</span>
+                            <button *ngIf="reunion.status === 'VALIDATED'" class="btn btn-sm btn-outline-primary me-1"
+                                (click)="openPvModal(reunion)" data-bs-toggle="modal" data-bs-target="#pvModal">
+                                PV
+                            </button>
+
+                            <button *ngIf="reunion.status === 'VALIDATED'" class="btn btn-sm btn-outline-secondary"
+                                (click)="openFilesModal(reunion)" data-bs-toggle="modal" data-bs-target="#filesModal">
+                                <i class="fas fa-paperclip me-1"></i> Fichiers
+                            </button>
+
+
+                            <span *ngIf="reunion.status === 'REJECTED'"
+                                class="text-white fst-italic badge text-uppercase fw-semibold bg-dark">La Réunion est
+                                rejetée
+                            </span>
+                            <span *ngIf="reunion.status === 'CANCELLED'"
+                                class="text-white fst-italic badge text-uppercase fw-semibold bg-danger">La Réunion est
+                                annulée
+                            </span>
+                        </ng-container>
+
+                        <ng-container *ngIf="role === 'Direction_technique'">
+                            <button *ngIf="reunion.status === 'PENDING'" class="btn btn-sm btn-primary me-1"
+                                (click)="openValidationModal(reunion)" title="Valider la réunion" data-bs-toggle="modal"
+                                data-bs-target="#validationModal">
+                                Valider
+                            </button>
+                            <button *ngIf="reunion.status === 'PENDING'" class="btn btn-sm btn-danger"
+                                (click)="openRejectionModal(reunion)" title="Rejeter la réunion" data-bs-toggle="modal"
+                                data-bs-target="#rejectionModal">
+                                Rejeter
+                            </button>
+                            <span *ngIf="reunion.status === 'REJECTED'"
+                                class="text-white fst-italic badge text-uppercase fw-semibold bg-dark">La Réunion est
+                                rejetée
+                            </span>
+                            <span *ngIf="reunion.status === 'CANCELLED'"
+                                class="text-white fst-italic badge text-uppercase fw-semibold bg-danger">La Réunion est
+                                annulée
+                            </span>
+                            <button *ngIf="reunion.status === 'VALIDATED'" class="btn btn-sm btn-outline-primary me-1"
+                                (click)="openPvModal(reunion)" data-bs-toggle="modal" data-bs-target="#pvModal">
+                                PV
+                            </button>
+
+                            <button *ngIf="reunion.status === 'VALIDATED'" class="btn btn-sm btn-outline-secondary"
+                                (click)="openFilesModal(reunion)" data-bs-toggle="modal" data-bs-target="#filesModal">
+                                <i class="fas fa-paperclip me-1"></i> Fichiers
+                            </button>
+                            <span *ngIf=" reunion.status==='SCHEDULED'"
+                                class="fst-italic badge text-uppercase fw-semibold bg-primary text-white ">En attend le
+                                FTE de confirmer la réunion</span>
+                        </ng-container>
+
+                        <ng-container *ngIf="role === 'Commission_techniques'">
+                            <span *ngIf="reunion.status === 'PENDING'"
+                                class="text-muted fst-italic badge text-uppercase fw-semibold bg-warning">En
+                                attente de
+                                validation</span>
+                            <button *ngIf="reunion.status === 'VALIDATED'" class="btn btn-sm btn-outline-primary me-1"
+                                (click)="openPvModal(reunion)" data-bs-toggle="modal" data-bs-target="#pvModal">
+                                PV
+                            </button>
+
+
+                            <button *ngIf="reunion.status === 'VALIDATED'" class="btn btn-sm btn-outline-secondary"
+                                (click)="openFilesModal(reunion)" data-bs-toggle="modal" data-bs-target="#filesModal">
+                                <i class="fas fa-paperclip me-1"></i> Fichiers
+                            </button>
+                            <span *ngIf=" reunion.status==='SCHEDULED'"
+                                class="fst-italic badge text-uppercase fw-semibold bg-primary text-white ">Le Direction
+                                technique validé</span>
+                            <span *ngIf="reunion.status === 'REJECTED'"
+                                class="text-white fst-italic badge text-uppercase fw-semibold bg-dark">La Réunion est
+                                rejetée
+                            </span>
+                            <span *ngIf="reunion.status === 'CANCELLED'"
+                                class="text-white fst-italic badge text-uppercase fw-semibold bg-danger">La Réunion est
+                                annulée
+                            </span>
+                        </ng-container>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal d'annulation -->
+<div class="modal fade" id="cancellationModal" tabindex="-1" aria-labelledby="cancellationModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title text-white" id="cancellationModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmer l'annulation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <div>
+                        Vous êtes sur le point d'annuler la réunion :
+                        <strong>"{{ currentReunion?.sujet }}"</strong>
+                    </div>
+                </div>
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <small>
+                        Cette action est irréversible. Tous les participants seront automatiquement
+                        notifiés de l'annulation.
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>
+                    Annuler
+                </button>
+                <button type="button" class="btn btn-warning" (click)="annulerReunion(currentReunion?.id)"
+                    data-bs-dismiss="modal">
+                    <i class="fas fa-ban me-1"></i>
+                    Confirmer l'annulation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Validation -->
+<div class="modal fade" id="validationModal" tabindex="-1" aria-labelledby="validationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="validationModalLabel">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    Validation de la réunion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="currentReunion">
+                    <!-- Informations de la réunion -->
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle me-2"></i>Détails de la réunion</h6>
+                        <p><strong>Sujet :</strong> {{ currentReunion.sujet }}</p>
+                        <p><strong>Date proposée :</strong> {{ currentReunion.dateProposee | date: 'dd/MM/yyyy HH:mm' }}
+                        </p>
+                    </div>
+
+                    <!-- Sélection des participants -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-users me-2"></i>
+                            <strong>Sélectionner les participants de la Commission Technique :</strong>
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="border rounded p-3 bg-light">
+                            <div class="form-check mb-2" *ngFor="let member of commissionsMembers">
+                                <input class="form-check-input" type="checkbox" [id]="'modal-participant-' + member.id"
+                                    (change)="onModalParticipantChange($event, member.id)">
+                                <label class="form-check-label" [for]="'modal-participant-' + member.id">
+                                    {{ member.firstname }} {{ member.lastname }}
+                                </label>
+                            </div>
+                            <small class="text-muted">Au moins un participant doit être sélectionné</small>
+                        </div>
+                    </div>
+
+                    <!-- Upload de fichiers -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-file-upload me-2"></i>
+                            <strong>Documents nécessaires pour la réunion :</strong>
+                            <span class="text-danger">*</span>
+                        </label>
+                        <input type="file" class="form-control" multiple (change)="onModalFilesSelected($event)"
+                            accept=".pdf,.doc,.docx,.xlsx,.ppt,.pptx">
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Formats acceptés: PDF, DOC, DOCX, XLSX, PPT, PPTX (Max: 10MB par fichier)
+                        </small>
+                        <div *ngIf="selectedFiles.length > 0" class="mt-2">
+                            <strong>Fichiers sélectionnés :</strong>
+                            <ul class="list-unstyled mt-1">
+                                <li *ngFor="let file of selectedFiles" class="text-success">
+                                    <i class="fas fa-file me-1"></i>{{ file.name }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Commentaire -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-comment me-2"></i>
+                            <strong>Commentaire (optionnel)</strong>
+                        </label>
+                        <textarea class="form-control" rows="3" [(ngModel)]="validationComment"
+                            placeholder="Ajoutez un commentaire sur la validation de cette réunion..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Annuler
+                </button>
+                <button type="button" class="btn btn-success" (click)="confirmerValidation()"
+                    [disabled]="selectedParticipants.length === 0 || selectedFiles.length === 0">
+                    <i class="fas fa-check me-1"></i>Confirmer la validation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Rejet -->
+<div class="modal fade" id="rejectionModal" tabindex="-1" aria-labelledby="rejectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectionModalLabel">
+                    <i class="fas fa-times-circle text-danger me-2"></i>
+                    Rejet de la réunion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="currentReunion">
+                    <!-- Informations de la réunion -->
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Réunion à rejeter</h6>
+                        <p><strong>Sujet :</strong> {{ currentReunion.sujet }}</p>
+                        <p><strong>Date proposée :</strong> {{ currentReunion.dateProposee | date: 'dd/MM/yyyy HH:mm' }}
+                        </p>
+                    </div>
+
+                    <!-- Motif de rejet -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-edit me-2"></i>
+                            <strong>Motif du rejet :</strong>
+                            <span class="text-danger">*</span>
+                        </label>
+                        <textarea class="form-control" rows="4" [(ngModel)]="rejectionReason"
+                            placeholder="Veuillez expliquer clairement les raisons du rejet de cette réunion..."
+                            required></textarea>
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Ce motif sera transmis au demandeur de la réunion
+                        </small>
+                    </div>
+
+                    <!-- Avertissement -->
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attention :</strong> Le rejet de cette réunion enverra une notification au demandeur
+                        avec votre motif.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-arrow-left me-1"></i>Retour
+                </button>
+                <button type="button" class="btn btn-danger" (click)="confirmerRejet()"
+                    [disabled]="!rejectionReason || rejectionReason.trim().length < 10">
+                    <i class="fas fa-times me-1"></i>Confirmer le rejet
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal de PV -->
+<div class="modal fade" id="pvModal" tabindex="-1" aria-labelledby="pvModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="pvModalLabel">PV de la réunion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="min-height: 500px;">
+                <ng-container *ngIf="pvLoading">
+                    <div class="text-center py-3">
+                        <div class="spinner-border" role="status"></div>
+                        <div class="mt-2">Chargement du PV…</div>
+                    </div>
+                </ng-container>
+                <!-- PV non publié -->
+                <div *ngIf="pvInfo==null" class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Le PV de réunion n'est pas encore publié.
+                </div>
+                <ng-container *ngIf="!pvLoading && pvInfo">
+                    <div class="mb-3">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        <strong>{{ pvInfo?.title || ('PV-' + currentReunion?.id) }}</strong>
+                    </div>
+                    <div class="mb-3">
+                        <span class="badge bg-secondary me-2">DT : {{ pvInfo?.signedByDT ? 'Signé' : 'Non signé'
+                            }}</span>
+                        <span class="badge bg-secondary">CT : {{ pvInfo?.signedByCT ? 'Signé' : 'Non signé' }}</span>
+                    </div>
+
+                    <!-- PDF Viewer intégré -->
+                    <button (click)="viewPv(pvInfo.id)">Voir PV</button>
+                    <div *ngIf="pdfUrl" class="border rounded mb-3" style="height: 500px;">
+                        <iframe [src]="pdfUrl" width="100%" height="600px"></iframe>
+                    </div>
+
+                    <!-- Bouton Nouvelle version pour FTE si PV rejeté -->
+                    <div *ngIf="role === 'Fte' && pvInfo.status === 'REJECTED'" class="mb-3">
+                        <button class="btn btn-warning" (click)="openNewPvVersionModal(pvInfo.id)">
+                            <i class="fas fa-file-upload me-1"></i> Nouvelle version
+                        </button>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <!-- Signature pour DT & CT si pas déjà signé -->
+                        <button
+                            *ngIf="(role === 'Direction_technique' || role === 'Commission_techniques') && !pvInfo?.alreadySignedByMe"
+                            class="btn btn-success" (click)="openSignatureModal(pvInfo.id)">
+                            <i class="fas fa-pen-nib me-1"></i> Signer
+                        </button>
+                        <!-- Rejet avec motif -->
+                        <button
+                            *ngIf="(role === 'Direction_technique' || role === 'Commission_techniques')&& !pvInfo?.alreadySignedByMe"
+                            class="btn btn-danger" (click)="toggleRejectPv()">
+                            <i class="fas fa-times me-1"></i> Refuser
+                        </button>
+                    </div>
+
+                    <!-- Zone motif de refus -->
+                    <div *ngIf="showRejectPv" class="mt-3">
+                        <label class="form-label">Motif du refus</label>
+                        <textarea class="form-control" rows="3" [(ngModel)]="pvRejectReason"
+                            placeholder="Expliquez le motif de refus…"></textarea>
+                        <div class="d-flex justify-content-end mt-2">
+                            <button class="btn btn-outline-secondary me-2" (click)="toggleRejectPv()">Annuler</button>
+                            <button class="btn btn-danger"
+                                [disabled]="!pvRejectReason || pvRejectReason.trim().length < 5"
+                                (click)="rejectPv(pvInfo.id)">
+                                Confirmer le refus
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Alerte téléchargement -->
+                    <div class="alert alert-warning mt-3"
+                        *ngIf="(!pvInfo?.published || !(pvInfo?.signedByDT && pvInfo?.signedByCT)) && !showRejectPv">
+                        <i class="fas fa-lock me-2"></i>
+                        Le téléchargement sera disponible quand :
+                        <ng-container *ngIf="!pvInfo?.published"><strong>le PV est publié</strong></ng-container>
+                        <ng-container *ngIf="pvInfo?.published && !(pvInfo?.signedByDT && pvInfo?.signedByCT)">
+                            <strong>DT et CT auront signé</strong>
+                        </ng-container>.
+                    </div>
+
+                    <!-- Télécharger uniquement si publié et signé par DT & CT -->
+                    <a *ngIf="pvInfo?.published && pvInfo?.signedByDT && pvInfo?.signedByCT && !showRejectPv && pvInfo?.downloadUrl"
+                        [href]="pvInfo.downloadUrl" class="btn btn-primary mt-2">
+                        <i class="fas fa-download me-1"></i> Télécharger le PV
+                    </a>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour uploader une nouvelle version de PV -->
+<div class="modal fade" id="newPvVersionModal" tabindex="-1" aria-labelledby="newPvVersionModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title text-white" id="newPvVersionModalLabel">
+                    <i class="fas fa-file-upload me-2"></i>
+                    Nouvelle version du PV
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-info-circle me-2"></i>Uploader une nouvelle version du PV</h6>
+                    <p>Veuillez sélectionner le nouveau fichier PDF pour mettre à jour le PV rejeté.</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-file-upload me-2"></i>
+                        <strong>Sélectionner le nouveau PV :</strong>
+                        <span class="text-danger">*</span>
+                    </label>
+                    <input type="file" class="form-control" (change)="onNewPvVersionSelected($event)" accept=".pdf">
+                    <small class="form-text text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Format accepté: PDF uniquement (Max: 10MB)
+                    </small>
+                    <div *ngIf="selectedNewPvVersion" class="mt-2">
+                        <strong>Fichier sélectionné :</strong>
+                        <p class="text-success">{{ selectedNewPvVersion.name }}</p>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-comment me-2"></i>
+                        <strong>Commentaire (optionnel)</strong>
+                    </label>
+                    <textarea class="form-control" rows="3" [(ngModel)]="newPvVersionComment"
+                        placeholder="Ajoutez un commentaire sur cette nouvelle version..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Annuler
+                </button>
+                <button type="button" class="btn btn-warning" (click)="uploadNewPvVersion()"
+                    [disabled]="!selectedNewPvVersion">
+                    <i class="fas fa-upload me-1"></i> Uploader
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Fichiers -->
+<div class="modal fade" id="filesModal" tabindex="-1" aria-labelledby="filesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title" id="filesModalLabel">Fichiers de la réunion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <ng-container *ngIf="filesLoading">
+                    <div class="text-center py-3">
+                        <div class="spinner-border" role="status"></div>
+                        <div class="mt-2">Chargement des fichiers…</div>
+                    </div>
+                </ng-container>
+
+                <ng-container *ngIf="!filesLoading">
+                    <div *ngIf="files?.length === 0" class="alert alert-light border">
+                        Aucun fichier trouvé pour cette réunion.
+                    </div>
+
+                    <ul class="list-group" *ngIf="files && files.length > 0">
+                        <li class="list-group-item d-flex justify-content-between align-items-center"
+                            *ngFor="let f of files">
+                            <div>
+                                <i class="fas fa-file me-2"></i>{{ f.nomFichier }}
+                                <small class="text-muted ms-2" *ngIf="f.dateUpload">
+                                    ({{ f.dateUpload | date:'dd/MM/yyyy HH:mm' }})
+                                </small>
+                            </div>
+
+                            <!-- Option A: si tu as un endpoint de téléchargement par docId 
+                            <a *ngIf="f.downloadUrl" [href]="f.downloadUrl" class="btn btn-sm btn-outline-primary">
+                                <button class="btn btn-sm btn-primary" (click)="f.download()">Télécharger</button>
+                            </a>-->
+                            <button class="btn btn-sm btn-primary" (click)="downloadFile(f)">Télécharger</button>
+                        </li>
+                    </ul>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de signature -->
+<div class="modal fade" [class.show]="showSignatureModal" [style.display]="showSignatureModal ? 'block' : 'none'"
+    tabindex="-1" [attr.aria-hidden]="!showSignatureModal">
+
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Signature électronique</h5>
+                <button type="button" class="btn-close btn-close-white" (click)="closeSignatureModal()"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <p class="text-center">Veuillez signer dans la zone ci-dessous :</p>
+                    <div class="signature-container">
+                        <canvas id="signatureCanvas" width="500" height="300" (mousedown)="startDrawing($event)"
+                            (mousemove)="draw($event)" (mouseup)="stopDrawing()" (mouseleave)="stopDrawing()"
+                            style="border: 1px solid #ccc; border-radius: 4px; background-color: white; cursor: crosshair;">
+                        </canvas>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" (click)="clearSignature()">
+                        <i class="fas fa-eraser me-1"></i> Effacer
+                    </button>
+
+                    <div>
+                        <button type="button" class="btn btn-secondary me-2"
+                            (click)="closeSignatureModal()">Annuler</button>
+                        <button type="button" class="btn btn-primary" (click)="confirmSignature()">
+                            <i class="fas fa-check me-1"></i> Confirmer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="showSignatureModal" class="modal-backdrop fade show"></div>
